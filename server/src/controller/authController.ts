@@ -42,7 +42,7 @@ export const registerUser = async (req: Request, res: Response): Promise<Respons
         await newUser.save();
        
         // generate a token using the userId and return it to the user as a cookie. 
-        const token = generateToken({ userId: newUser._id });
+        const token = generateToken({ userId: newUser._id.toString() });
 
         res.cookie('authtoken', token, cookieOptions);
         
@@ -76,13 +76,8 @@ export const loginUser = async (req: Request, res: Response): Promise<Response> 
         }
 		
         // search in the database for the name and email from the client. 
-        const [userByName, userByEmail] = await Promise.all([
-            User.findOne({ name }),
-            User.findOne({ email })
-        ]);
+        const user = await User.findOne({ name, email });
 
-        // if the username is not null the user email is assigned the variable.
-        const user = userByName && userByEmail;
 
         // if the user variable doesn't exist return an error to the client.
         if (!user) {
@@ -98,7 +93,7 @@ export const loginUser = async (req: Request, res: Response): Promise<Response> 
         }
 
         // generate a token using the userId and return it to the user as a cookie.
-        const token = generateToken({ userId: user._id });
+        const token = generateToken({ userId: user._id.toString() });
         
         res.cookie('authtoken', token, cookieOptions);
 
